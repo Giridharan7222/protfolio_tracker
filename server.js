@@ -10,30 +10,12 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
-const dbConfig = {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-};
-
-let pool;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
 async function initDB() {
-  // Connect to default 'postgres' DB to create our DB if missing
-  const adminPool = new Pool({ ...dbConfig, database: 'postgres' });
-  await adminPool.query(`
-    SELECT 'CREATE DATABASE ${process.env.DB_NAME}'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${process.env.DB_NAME}')
-  `).then(async (res) => {
-    if (res.rows.length) await adminPool.query(`CREATE DATABASE ${process.env.DB_NAME}`);
-  });
-  await adminPool.end();
-
-  // Now connect to the actual DB
-  pool = new Pool(dbConfig);
-
   await pool.query(`
     CREATE TABLE IF NOT EXISTS visits (
       id           SERIAL PRIMARY KEY,
