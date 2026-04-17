@@ -7,10 +7,12 @@ const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors({
+const corsOptions = {
   origin: process.env.ALLOWED_ORIGIN || 'http://localhost:5173',
-  methods: ['POST'],
-}));
+  methods: ['GET', 'POST', 'OPTIONS'],
+};
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const pool = new Pool({
