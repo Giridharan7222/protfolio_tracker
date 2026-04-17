@@ -11,7 +11,7 @@ const corsOptions = {
   origin: process.env.ALLOWED_ORIGIN || 'http://localhost:5173',
   methods: ['GET', 'POST', 'OPTIONS'],
 };
-app.options('*', cors(corsOptions));
+app.options('/(.*)', cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json());
 
